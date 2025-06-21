@@ -17,29 +17,74 @@
       align-items: center;
       height: 100vh;
       flex-direction: column;
+      text-align: center;
     }
-    h1 {
+
+    .logo-container {
+      position: relative;
+    }
+
+    .main-logo {
       font-size: 2.5rem;
       margin: 0;
+      font-weight: bold;
     }
+
+    .splash-text {
+      position: absolute;
+      top: -1.2rem;
+      right: -2.5rem;
+      transform: rotate(-20deg);
+      font-size: 1rem;
+      opacity: 0.75;
+      animation: fade 2s ease-in-out infinite alternate;
+      white-space: nowrap;
+    }
+
     p {
-      margin-top: 0.5rem;
+      margin-top: 2rem;
       opacity: 0.8;
+    }
+
+    @keyframes fade {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to AMObzid1an.space</h1>
+
+  <div class="logo-container">
+    <h1 class="main-logo">AMObzid1an</h1>
+    <span class="splash-text" id="splash-text">Calibrating dimensions...</span>
+  </div>
+
   <p>This space is currently forming<span id="dots"></span></p>
 
   <script>
+    // Dots animation
     let dotCount = 0;
     const dotEl = document.getElementById("dots");
     setInterval(() => {
       dotCount = (dotCount + 1) % 4;
       dotEl.textContent = ".".repeat(dotCount);
     }, 500);
+
+    // Random splash text on refresh
+    const phrases = [
+      "Calibrating dimensions...",
+      "Currently dreaming...",
+      "Transmission decoded",
+      "Signal received",
+      "Dust of stardust",
+      "This isn’t even my final form",
+      "Runes aligning",
+      "Projecting from a parallel",
+      "Not from this timeline"
+    ];
+    const splash = document.getElementById("splash-text");
+    splash.textContent = phrases[Math.floor(Math.random() * phrases.length)];
   </script>
+
 </body>
 </html>
-
