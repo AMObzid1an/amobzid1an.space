@@ -50,6 +50,36 @@
     opacity: 1;
     filter: drop-shadow(0 0 18px #3a003d);
   }
+  /* Container placement — tweak top/left as you like */
+.gallery-portal {
+    position: absolute;
+    top: 250px;          /* << move up / down */
+    left: 60px;          /* << move left / right */
+    width: 120px;        /* size of the portal tile  */
+    height: 120px;
+}
+
+/* Re-use the glow animation & black ring you already built */
+.gallery-portal .portal-image {
+    width: 100%;
+    height: auto;
+    animation: pulse-glow 3s ease-in-out infinite;
+    border-radius: 50%;          /* <- keeps the round shape */
+    filter: drop-shadow(0 0 10px #2a0134);
+}
+
+/* Small overlay icon (centre it) */
+.gallery-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.2rem;        /* bigger = 2x the size of YouTube icon */
+    opacity: 0.9;
+    pointer-events: none;     /* keep clicks on the link itself */
+    /* bonus glow: */
+    text-shadow: 0 0 6px #bb00ff;
+}
 }
 </style>
 
@@ -121,7 +151,11 @@
     <h1 class="main-logo">AMObzid1an</h1>
     <span class="splash-text" id="splash-text">Calibrating dimensions...</span>
   </div>
-
+<!---- Gallery portal – links to /gallery -->
+<a class="portal gallery-portal" href="/gallery">
+    <img src="gal-portal.png" alt="Gallery portal" class="portal-image">
+    <span class="gallery-icon">🖼️</span>   <!-- you can swap 🖼️ for an SVG -->
+</a>
   <p>This space is currently forming<span id="dots"></span></p>
 
   <script>
