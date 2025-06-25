@@ -1,6 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <style>
+  .portal-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 999;
+  }
+
+  .portal-image {
+    width: 150px;
+    height: 150px;
+    opacity: 0.8;
+    border-radius: 50%;
+    animation: pulseGlow 3s ease-in-out infinite;
+    transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .portal-image:hover {
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 0 0 30px 10px rgba(173, 216, 230, 0.6); /* aura intensifies on hover */
+  }
+
+  @keyframes pulseGlow {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 10px 4px rgba(173, 216, 230, 0.3);
+    }
+    50% {
+      transform: scale(1.2);
+      box-shadow: 0 0 20px 10px rgba(173, 216, 230, 0.6);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 10px 4px rgba(173, 216, 230, 0.3);
+    }
+  }
+</style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AMObzid1an Space</title>
@@ -59,7 +97,11 @@
   </style>
 </head>
 <body>
-
+<div class="portal-container">
+  <a href="https://www.youtube.com/@AMObzid1an" target="_blank">
+  <img src="Portal.png" alt="Portal to YouTube" class="portal-image" />
+  </a>
+</div>
   <div class="logo-container">
     <h1 class="main-logo">AMObzid1an</h1>
     <span class="splash-text" id="splash-text">Calibrating dimensions...</span>
