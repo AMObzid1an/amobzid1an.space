@@ -109,7 +109,27 @@
     opacity: 0.85;
     pointer-events: none;
   }
+.portal-link::after {
+  content: "YouTube";
+  position: absolute;
+  bottom: -1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  color: #ff0055;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  text-shadow: 0 0 5px #000;
+  pointer-events: none;
+}
 
+.portal-link:hover::after {
+  opacity: 0.9;
+}
+
+.portal-link:hover .portal-image {
+  filter: drop-shadow(0 0 12px #ff0077) brightness(1.2);
+}
   /* Gallery Portal (Top Right) */
   .gallery-portal {
     position: absolute;
@@ -138,6 +158,27 @@
     pointer-events: none;
     text-shadow: 0 0 6px #bb00ff;
   }
+  .gallery-portal::after {
+  content: "Gallery";
+  position: absolute;
+  bottom: -1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  color: #00bbff;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  text-shadow: 0 0 5px #000;
+  pointer-events: none;
+}
+
+.gallery-portal:hover::after {
+  opacity: 0.9;
+}
+
+.gallery-portal:hover .portal-image {
+  filter: drop-shadow(0 0 12px #00ccff) brightness(1.2);
+}
 </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
