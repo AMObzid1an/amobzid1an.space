@@ -1,59 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AMObzid1an Gallery</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #0a0a0a;
-      color: white;
-      font-family: sans-serif;
-    }
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
-      padding: 20px;
-    }
-    .gallery-item {
-      position: relative;
-      overflow: hidden;
-      border-radius: 12px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .gallery-item:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-    }
-    .gallery-item img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    .gallery-item a {
-      display: block;
-      text-decoration: none;
-    }
-  </style>
-</head>
-<body>
-  <h1 style="text-align:center; padding: 20px 0;">AMObzid1an Gallery</h1>
-  <div class="gallery">
-    <div class="gallery-item">
-      <a href="/images/fullsize1.png" target="_blank">
-        <img src="/images/thumb1.png" alt="Art Piece 1" />
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="/images/fullsize2.png" target="_blank">
-        <img src="/images/thumb2.png" alt="Art Piece 2" />
-      </a>
-    </div>
-    <!-- Add more items below following the pattern -->
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gallery – AMObzid1an</title>
+    <!-- ────────────────────────────────────────────────────────────── -->
+    <!--  Basic styling – mirrors the landing‑page aesthetic           -->
+    <!--  Feel free to move these rules into /css/styles.css later     -->
+    <!-- ────────────────────────────────────────────────────────────── -->
+    <style>
+      /* Page background + typography */
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        color: #e0e0e0;
+        background: url('/assets/images/background.png') no-repeat center/cover fixed;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      h1 {
+        margin: 2rem 0 0.5rem;
+        font-size: 2rem;
+        text-shadow: 0 0 5px #000;
+      }
+
+      /* ====  Masonry‑ish Grid ==================================== */
+      .gallery-grid {
+        width: 90%;
+        max-width: 1400px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 22px;
+        padding: 2rem 0 4rem;
+      }
+
+      /* ====  Each item  ========================================= */
+      .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 14px;
+        cursor: pointer;
+        /* subtle static glow – grows on hover */
+        box-shadow: 0 0 0 3px rgba(0, 187, 255, 0.15), 0 0 18px rgba(0, 0, 0, 0.6);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .gallery-item:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 0 0 3px rgba(0, 187, 255, 0.6), 0 0 28px 8px rgba(0, 187, 255, 0.3);
+      }
+
+      .gallery-item img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* ====  Optional title hover  =============================== */
+      .gallery-item[data-title]::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.6);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+
+      .gallery-item:hover::after {
+        opacity: 0.95;
+      }
+
+      /* ====  Back‑home portal (optional)  ======================== */
+      .home-portal {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
+        width: 90px;
+        height: 90px;
+      }
+
+      .home-portal img {
+        width: 100%;
+        border-radius: 50%;
+        animation: pulse-glow 3s ease-in-out infinite;
+        filter: drop-shadow(0 0 10px #2a0134);
+      }
+
+      @keyframes pulse-glow {
+        0%, 100% {
+          transform: scale(1);
+          filter: drop-shadow(0 0 10px #6a0dad);
+        }
+        50% {
+          transform: scale(1.1);
+          filter: drop-shadow(0 0 18px #3a003d);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 🔙 Portal back to landing page (optional) -->
+    <a class="home-portal" href="/">
+      <img src="/assets/images/Portal.png" alt="Home" />
+    </a>
+
+    <h1>Gallery</h1>
+
+    <div class="gallery-grid" id="galleryGrid"></div>
+
+    <!-- ────────────────────────────────────────────────────────── -->
+    <!--  Script to:                                               -->
+    <!--   1) Randomize image order                                -->
+    <!--   2) Render thumbs                                        -->
+    <!--   3) Make each tile link to full‑size image               -->
+    <!--   4) Support optional title hover                         -->
+    <!-- ────────────────────────────────────────────────────────── -->
+    <script>
+      // 1)  Define your images here.  Add/remove as needed.
+      //     thumb = smaller preview
+      //     full  = large version (can be same as thumb if you prefer)
+      //     title = optional image title (string or '')
+
+      const images = [
+        { thumb: '/assets/gallery/thumbs/1.jpg', full: '/assets/gallery/full/1.jpg', title: 'Dream 01' },
+        { thumb: '/assets/gallery/thumbs/2.jpg', full: '/assets/gallery/full/2.jpg', title: 'Spiral 02' },
+        { thumb: '/assets/gallery/thumbs/3.jpg', full: '/assets/gallery/full/3.jpg', title: '' },
+        // …add more objects here
+      ];
+
+      // 2)  Shuffle (Fisher‑Yates)
+      for (let i = images.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [images[i], images[j]] = [images[j], images[i]];
+      }
+
+      // 3)  Render into grid
+      const grid = document.getElementById('galleryGrid');
+
+      images.forEach(({ thumb, full, title }) => {
+        const link = document.createElement('a');
+        link.href = full;
+        link.target = '_blank';
+        link.className = 'gallery-item';
+        if (title) link.setAttribute('data-title', title);
+
+        const img = document.createElement('img');
+        img.src = thumb;
+        img.alt = title || 'Artwork';
+
+        link.appendChild(img);
+        grid.appendChild(link);
+      });
+    </script>
+  </body>
 </html>
