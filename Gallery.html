@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMObzid1an Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #0a0a0a;
+      color: white;
+      font-family: sans-serif;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      padding: 20px;
+    }
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .gallery-item:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .gallery-item a {
+      display: block;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center; padding: 20px 0;">AMObzid1an Gallery</h1>
+  <div class="gallery">
+    <div class="gallery-item">
+      <a href="/images/fullsize1.png" target="_blank">
+        <img src="/images/thumb1.png" alt="Art Piece 1" />
+      </a>
+    </div>
+    <div class="gallery-item">
+      <a href="/images/fullsize2.png" target="_blank">
+        <img src="/images/thumb2.png" alt="Art Piece 2" />
+      </a>
+    </div>
+    <!-- Add more items below following the pattern -->
+  </div>
+</body>
+</html>
