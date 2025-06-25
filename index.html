@@ -22,16 +22,18 @@
   width: 100%;
   height: auto;
   animation: pulse-glow 3s ease-in-out infinite;
-  filter: drop-shadow(0 0 10px #6a0dad);
+  filter: drop-shadow(0 0 10px #2A0134);
 }
 
 .youtube-icon {
   position: absolute;
-  width: 30px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(2);
+  width: 30px; /* this becomes 60px visually due to scale(2) */
   height: auto;
-  bottom: 5px;
-  right: 5px;
   opacity: 0.85;
+  pointer-events: none;
 }
 
 @keyframes pulse-glow {
