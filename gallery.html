@@ -182,11 +182,15 @@
         img.src = thumb;
         img.alt = title || 'Artwork';
 
-        if (orientation === 'flippable') {
-          img.style.transform = Math.random() < 0.5 ? 'rotate(0deg)' : 'rotate(180deg)';
-        } else if (orientation === 'wild') {
-          img.style.transform = `rotate(${Math.floor(Math.random() * 360)}deg)`;
-        }
+   if (orientation === 'flippable') {
+  // 0° (upright)  or 180° (upside-down)
+  img.style.transform = Math.random() < 0.5 ? 'rotate(0deg)' : 'rotate(180deg)';
+} else if (orientation === 'wild') {
+  // 0°, 90°, 180°, or 270°  (upright / sideways / upside-down)
+  const angles = [0, 90, 180, 270];
+  const angle  = angles[Math.floor(Math.random() * angles.length)];
+  img.style.transform = `rotate(${angle}deg)`;
+}
 
         link.appendChild(img);
         grid.appendChild(link);
