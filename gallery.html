@@ -1,220 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gallery – AMObzid1an</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery – AMObzid1an</title>
 
-    <style>
-      body {
-        margin: 0;
-        background: url('/background.png') no-repeat center/cover fixed;
-        background-size: cover;
-        font-family: sans-serif;
-        color: #e0e0e0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
+  <style>
+    body {
+      margin: 0;
+      background: url('/background.png') no-repeat center/cover fixed;
+      background-size: cover;
+      font-family: sans-serif;
+      color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin: 2rem 0 0.5rem;
+      font-size: 2rem;
+      text-shadow: 0 0 5px #000;
+    }
+
+    .gallery-grid {
+      width: 90%;
+      max-width: 1400px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 22px;
+      padding: 2rem 0 4rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: visible;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(0, 187, 255, 0.15), 0 0 18px rgba(0, 0, 0, 0.6);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 0 0 3px rgba(0, 187, 255, 0.6), 0 0 28px 8px rgba(0, 187, 255, 0.3);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .gallery-item[data-title]::after {
+      content: attr(data-title);
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .gallery-item:hover::after {
+      opacity: 0.95;
+    }
+
+    .home-portal {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      width: 90px;
+      height: 90px;
+    }
+
+    .home-portal img {
+      width: 100%;
+      border-radius: 50%;
+      animation: pulse-glow 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px #2a0134);
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 10px #6a0dad);
+      }
+      50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 18px #3a003d);
+      }
+    }
+
+    #filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+
+    #filters button {
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: #222;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      border-radius: 6px;
+      transition: background 0.25s, box-shadow 0.25s;
+    }
+
+    #filters button.active {
+      background: #7700ff;
+      box-shadow: 0 0 8px #7700ff;
+    }
+  </style>
+</head>
+<body>
+  <a class="home-portal" href="/">
+    <img src="/assets/images/Portal.png" alt="Home" />
+  </a>
+
+  <h1>Gallery</h1>
+
+  <div id="filters">
+    <button data-group="type" data-value="all" class="active">All Media</button>
+    <button data-group="type" data-value="digital">Digital</button>
+    <button data-group="type" data-value="traditional">Hand-Drawn</button>
+    <button data-group="orientation" data-value="all" class="active">Any Orientation</button>
+    <button data-group="orientation" data-value="fixed">Fixed</button>
+    <button data-group="orientation" data-value="flippable">Flippable</button>
+    <button data-group="orientation" data-value="wild">Wild</button>
+  </div>
+
+  <div class="gallery-grid" id="galleryGrid"></div>
+
+  <script>
+    const images = [
+      {
+        thumb: '/assets/gallery/thumbs/85-Verde-Lunaris.png',
+        full: '/assets/gallery/full/85-Verde-Lunaris.jpg',
+        title: '85 Verde-Lunaris',
+        type: 'digital',
+        orientation: 'wild'
+      }
+      // Add more…
+    ];
+
+    for (let i = images.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [images[i], images[j]] = [images[j], images[i]];
+    }
+
+    const grid = document.getElementById('galleryGrid');
+    images.forEach(({ thumb, full, title, type, orientation }) => {
+      const link = document.createElement('a');
+      link.href = full;
+      link.target = '_blank';
+      link.className = 'gallery-item';
+      link.dataset.type = type;
+      link.dataset.orientation = orientation;
+      if (title) link.dataset.title = title;
+
+      // Container rotation logic
+      if (orientation === 'flippable') {
+        link.style.transform = Math.random() < 0.5 ? 'rotate(0deg)' : 'rotate(180deg)';
+      } else if (orientation === 'wild') {
+        const angles = [0, 90, 180, 270];
+        const angle = angles[Math.floor(Math.random() * angles.length)];
+        link.style.transform = `rotate(${angle}deg)`;
       }
 
-      h1 {
-        margin: 2rem 0 0.5rem;
-        font-size: 2rem;
-        text-shadow: 0 0 5px #000;
-      }
+      const img = document.createElement('img');
+      img.src = thumb;
+      img.alt = title || 'Artwork';
 
-      .gallery-grid {
-        width: 90%;
-        max-width: 1400px;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-        gap: 22px;
-        padding: 2rem 0 4rem;
-      }
+      link.appendChild(img);
+      grid.appendChild(link);
+    });
 
-      .gallery-item {
-        position: relative;
-        overflow: hidden;
-        border-radius: 14px;
-        cursor: pointer;
-        box-shadow: 0 0 0 3px rgba(0, 187, 255, 0.15), 0 0 18px rgba(0, 0, 0, 0.6);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-
-      .gallery-item:hover {
-        transform: translateY(-6px) scale(1.02);
-        box-shadow: 0 0 0 3px rgba(0, 187, 255, 0.6), 0 0 28px 8px rgba(0, 187, 255, 0.3);
-      }
-
-      .gallery-item img {
-        width: 100%;
-        height: auto;
-        display: block;
-      }
-
-      .gallery-item[data-title]::after {
-        content: attr(data-title);
-        position: absolute;
-        bottom: 8px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.6);
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        white-space: nowrap;
-        pointer-events: none;
-      }
-
-      .gallery-item:hover::after {
-        opacity: 0.95;
-      }
-
-      .home-portal {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 10;
-        width: 90px;
-        height: 90px;
-      }
-
-      .home-portal img {
-        width: 100%;
-        border-radius: 50%;
-        animation: pulse-glow 3s ease-in-out infinite;
-        filter: drop-shadow(0 0 10px #2a0134);
-      }
-
-      @keyframes pulse-glow {
-        0%, 100% {
-          transform: scale(1);
-          filter: drop-shadow(0 0 10px #6a0dad);
-        }
-        50% {
-          transform: scale(1.1);
-          filter: drop-shadow(0 0 18px #3a003d);
-        }
-      }
-
-      #filters {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        justify-content: center;
-        margin: 1rem 0;
-      }
-
-      #filters button {
-        padding: 0.35rem 0.8rem;
-        font-size: 0.8rem;
-        cursor: pointer;
-        background: #222;
-        color: #e0e0e0;
-        border: 1px solid #555;
-        border-radius: 6px;
-        transition: background 0.25s, box-shadow 0.25s;
-      }
-
-      #filters button.active {
-        background: #7700ff;
-        box-shadow: 0 0 8px #7700ff;
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- 🔙 Portal back to landing page -->
-    <a class="home-portal" href="/">
-      <img src="/assets/images/Portal.png" alt="Home" />
-    </a>
-
-    <h1>Gallery</h1>
-
-    <!-- Filter Controls -->
-    <div id="filters">
-      <!-- Medium -->
-      <button data-group="type" data-value="all" class="active">All Media</button>
-      <button data-group="type" data-value="digital">Digital</button>
-      <button data-group="type" data-value="traditional">Hand-Drawn</button>
-      <!-- Orientation -->
-      <button data-group="orientation" data-value="all" class="active">Any Orientation</button>
-      <button data-group="orientation" data-value="fixed">Fixed</button>
-      <button data-group="orientation" data-value="flippable">Flippable</button>
-      <button data-group="orientation" data-value="wild">Wild</button>
-    </div>
-
-    <!-- Gallery Container -->
-    <div class="gallery-grid" id="galleryGrid"></div>
-
-    <!-- Script -->
-    <script>
-      const images = [
-        {
-  thumb: '/assets/gallery/thumbs/85-Verde-Lunaris.png',
-  full: '/assets/gallery/full/85-Verde-Lunaris.jpg',
-  title: '85 Verde-Lunaris',
-  type: 'digital',
-  orientation: 'wild'
-},
-        // Add more…
-      ];
-
-      for (let i = images.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [images[i], images[j]] = [images[j], images[i]];
-      }
-
-      const grid = document.getElementById('galleryGrid');
-      images.forEach(({ thumb, full, title, type, orientation }) => {
-        const link = document.createElement('a');
-        link.href = full;
-        link.target = '_blank';
-        link.className = 'gallery-item';
-        link.dataset.type = type;
-        link.dataset.orientation = orientation;
-        if (title) link.dataset.title = title;
-
-        const img = document.createElement('img');
-        img.src = thumb;
-        img.alt = title || 'Artwork';
-
-   if (orientation === 'flippable') {
-  // 0° (upright)  or 180° (upside-down)
-  img.style.transform = Math.random() < 0.5 ? 'rotate(0deg)' : 'rotate(180deg)';
-} else if (orientation === 'wild') {
-  // 0°, 90°, 180°, or 270°  (upright / sideways / upside-down)
-  const angles = [0, 90, 180, 270];
-  const angle  = angles[Math.floor(Math.random() * angles.length)];
-  img.style.transform = `rotate(${angle}deg)`;
-}
-
-        link.appendChild(img);
-        grid.appendChild(link);
+    const state = { type: 'all', orientation: 'all' };
+    document.querySelectorAll('#filters button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const { group, value } = btn.dataset;
+        document.querySelectorAll(`#filters button[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state[group] = value;
+        applyFilters();
       });
+    });
 
-      const state = { type: 'all', orientation: 'all' };
-
-      document.querySelectorAll('#filters button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const { group, value } = btn.dataset;
-          document.querySelectorAll(`#filters button[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          state[group] = value;
-          applyFilters();
-        });
+    function applyFilters() {
+      document.querySelectorAll('.gallery-item').forEach(item => {
+        const okType = state.type === 'all' || item.dataset.type === state.type;
+        const okOri = state.orientation === 'all' || item.dataset.orientation === state.orientation;
+        item.style.display = (okType && okOri) ? 'block' : 'none';
       });
-
-      function applyFilters() {
-        document.querySelectorAll('.gallery-item').forEach(item => {
-          const okType = state.type === 'all' || item.dataset.type === state.type;
-          const okOri  = state.orientation === 'all' || item.dataset.orientation === state.orientation;
-          item.style.display = (okType && okOri) ? 'block' : 'none';
-        });
-      }
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
