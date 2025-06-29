@@ -4,10 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gallery – AMObzid1an</title>
-    <!-- ────────────────────────────────────────────────────────────── -->
-    <!--  Basic styling – mirrors the landing‑page aesthetic           -->
-    <!--  Feel free to move these rules into /css/styles.css later     -->
-    <!-- ────────────────────────────────────────────────────────────── -->
+
     <style>
       body {
         margin: 0;
@@ -27,7 +24,6 @@
         text-shadow: 0 0 5px #000;
       }
 
-      /* ====  Masonry‑ish Grid ==================================== */
       .gallery-grid {
         width: 90%;
         max-width: 1400px;
@@ -37,13 +33,11 @@
         padding: 2rem 0 4rem;
       }
 
-      /* ====  Each item  ========================================= */
       .gallery-item {
         position: relative;
         overflow: hidden;
         border-radius: 14px;
         cursor: pointer;
-        /* subtle static glow – grows on hover */
         box-shadow: 0 0 0 3px rgba(0, 187, 255, 0.15), 0 0 18px rgba(0, 0, 0, 0.6);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
@@ -59,7 +53,6 @@
         display: block;
       }
 
-      /* ====  Optional title hover  =============================== */
       .gallery-item[data-title]::after {
         content: attr(data-title);
         position: absolute;
@@ -80,7 +73,6 @@
         opacity: 0.95;
       }
 
-      /* ====  Back‑home portal (optional)  ======================== */
       .home-portal {
         position: fixed;
         top: 20px;
@@ -107,61 +99,114 @@
           filter: drop-shadow(0 0 18px #3a003d);
         }
       }
+
+      #filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+        margin: 1rem 0;
+      }
+
+      #filters button {
+        padding: 0.35rem 0.8rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+        background: #222;
+        color: #e0e0e0;
+        border: 1px solid #555;
+        border-radius: 6px;
+        transition: background 0.25s, box-shadow 0.25s;
+      }
+
+      #filters button.active {
+        background: #7700ff;
+        box-shadow: 0 0 8px #7700ff;
+      }
     </style>
   </head>
+
   <body>
-    <!-- 🔙 Portal back to landing page (optional) -->
+    <!-- 🔙 Portal back to landing page -->
     <a class="home-portal" href="/">
       <img src="/assets/images/Portal.png" alt="Home" />
     </a>
 
     <h1>Gallery</h1>
 
+    <!-- Filter Controls -->
+    <div id="filters">
+      <!-- Medium -->
+      <button data-group="type" data-value="all" class="active">All Media</button>
+      <button data-group="type" data-value="digital">Digital</button>
+      <button data-group="type" data-value="traditional">Hand-Drawn</button>
+      <!-- Orientation -->
+      <button data-group="orientation" data-value="all" class="active">Any Orientation</button>
+      <button data-group="orientation" data-value="fixed">Fixed</button>
+      <button data-group="orientation" data-value="flippable">Flippable</button>
+      <button data-group="orientation" data-value="wild">Wild</button>
+    </div>
+
+    <!-- Gallery Container -->
     <div class="gallery-grid" id="galleryGrid"></div>
 
-    <!-- ────────────────────────────────────────────────────────── -->
-    <!--  Script to:                                               -->
-    <!--   1) Randomize image order                                -->
-    <!--   2) Render thumbs                                        -->
-    <!--   3) Make each tile link to full‑size image               -->
-    <!--   4) Support optional title hover                         -->
-    <!-- ────────────────────────────────────────────────────────── -->
+    <!-- Script -->
     <script>
-      // 1)  Define your images here.  Add/remove as needed.
-      //     thumb = smaller preview
-      //     full  = large version (can be same as thumb if you prefer)
-      //     title = optional image title (string or '')
-
       const images = [
-        { thumb: '/assets/gallery/thumbs/1.jpg', full: '/assets/gallery/full/1.jpg', title: 'Dream 01' },
-        { thumb: '/assets/gallery/thumbs/2.jpg', full: '/assets/gallery/full/2.jpg', title: 'Spiral 02' },
-        { thumb: '/assets/gallery/thumbs/3.jpg', full: '/assets/gallery/full/3.jpg', title: '' },
-        // …add more objects here
+        { thumb: '/assets/gallery/thumbs/1.jpg', full: '/assets/gallery/full/1.jpg', title: 'Dream 01',        type: 'digital',     orientation: 'fixed' },
+        { thumb: '/assets/gallery/thumbs/2.jpg', full: '/assets/gallery/full/2.jpg', title: 'Flux 02',         type: 'digital',     orientation: 'flippable' },
+        { thumb: '/assets/gallery/thumbs/3.jpg', full: '/assets/gallery/full/3.jpg', title: 'Hand Grid',       type: 'traditional', orientation: 'wild' },
+        // Add more…
       ];
 
-      // 2)  Shuffle (Fisher‑Yates)
       for (let i = images.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [images[i], images[j]] = [images[j], images[i]];
       }
 
-      // 3)  Render into grid
       const grid = document.getElementById('galleryGrid');
-
-      images.forEach(({ thumb, full, title }) => {
+      images.forEach(({ thumb, full, title, type, orientation }) => {
         const link = document.createElement('a');
         link.href = full;
         link.target = '_blank';
         link.className = 'gallery-item';
-        if (title) link.setAttribute('data-title', title);
+        link.dataset.type = type;
+        link.dataset.orientation = orientation;
+        if (title) link.dataset.title = title;
 
         const img = document.createElement('img');
         img.src = thumb;
         img.alt = title || 'Artwork';
 
+        if (orientation === 'flippable') {
+          img.style.transform = Math.random() < 0.5 ? 'rotate(0deg)' : 'rotate(180deg)';
+        } else if (orientation === 'wild') {
+          img.style.transform = `rotate(${Math.floor(Math.random() * 360)}deg)`;
+        }
+
         link.appendChild(img);
         grid.appendChild(link);
       });
+
+      const state = { type: 'all', orientation: 'all' };
+
+      document.querySelectorAll('#filters button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const { group, value } = btn.dataset;
+          document.querySelectorAll(`#filters button[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state[group] = value;
+          applyFilters();
+        });
+      });
+
+      function applyFilters() {
+        document.querySelectorAll('.gallery-item').forEach(item => {
+          const okType = state.type === 'all' || item.dataset.type === state.type;
+          const okOri  = state.orientation === 'all' || item.dataset.orientation === state.orientation;
+          item.style.display = (okType && okOri) ? 'block' : 'none';
+        });
+      }
     </script>
   </body>
 </html>
