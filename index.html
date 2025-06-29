@@ -3,6 +3,21 @@
 <head>
 <style>
   /* General Body Styling */
+  .credits-portal{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 12;          /* above other elements */
+  width: 70px;          /* tweak size here */
+  height: 70px;
+}
+
+.credits-portal img{
+  width: 100%;
+  border-radius: 50%;
+  animation: pulse-glow 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px #7700ff);
+}
   body {
     margin: 0;
     padding: 0;
@@ -370,6 +385,9 @@
     const splash = document.getElementById("splash-text");
     splash.textContent = phrases[Math.floor(Math.random() * phrases.length)];
   </script>
-
+<!-- Credits / License portal -->
+<a class="credits-portal" href="/credits.html" title="Usage & Credits" target="_blank">
+  <img src="/assets/images/Portal-Small.png" alt="Usage & Credits">
+</a>
 </body>
 </html>
