@@ -84,6 +84,10 @@
     box-shadow: 0 0 3px rgba(0, 187, 255, 0.6), 0 0 28px 8px rgba(0, 187, 255, 0.3);
   }
 
+  .gallery-item:focus {
+  outline: none;
+  box-shadow: 0 0 8px 3px rgba(187, 255, 255, 0.4); /* or whatever glow you want */
+}
   /* ─── title ────────────────────────────────────────────── */
   .image-title {
     margin-top: 0.4rem;
@@ -185,7 +189,7 @@ for(let i=images.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[imag
 const grid = document.getElementById('galleryGrid');
 images.forEach(({thumb, full, title, type}) => {
   const link = document.createElement('a');
-  link.href = `view.html?src=${encodeURIComponent(full)}&title=${encodeURIComponent(title || '')}`;
+  link.href = `fullview.html?src=${encodeURIComponent(full)}&title=${encodeURIComponent(title || '')}`;
   link.className = 'gallery-item';
   link.dataset.type = type;
 
