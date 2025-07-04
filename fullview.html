@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Artwork Viewer – AMObzid1an</title>
+  <style>
+    body {
+      margin: 0;
+      background: url('/background.png') no-repeat center/cover fixed;
+      font-family: sans-serif;
+      color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+      text-shadow: 0 0 5px #000;
+    }
+
+    .image-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .art-image {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 14px;
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
+      transition: transform 0.3s ease;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    button, a.download-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      background: #222;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.25s;
+    }
+
+    button:hover, .download-btn:hover {
+      background: #7700ff;
+    }
+
+    .description {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1rem;
+      border-radius: 10px;
+      max-width: 700px;
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    video {
+      margin-top: 2rem;
+      max-width: 90vw;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="art-title">Loading...</h1>
+
+  <div class="image-container">
+    <img id="art-img" class="art-image" src="" alt="Artwork" />
+    <div class="controls">
+      <button onclick="rotateImage(-90)">↺ Rotate Left</button>
+      <button onclick="rotateImage(90)">↻ Rotate Right</button>
+      <a id="download-link" class="download-btn" href="#" download>Download HQ</a>
+    </div>
+  </div>
+
+  <div class="description" id="art-description"></div>
+
+  <video id="timelapse" controls style="display:none"></video>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const artId = params.get('id');
+    const artImg = document.getElementById('art-img');
+    const titleEl = document.getElementById('art-title');
+    const descEl = document.getElementById('art-description');
+    const downloadEl = document.getElementById('download-link');
+    const videoEl = document.getElementById('timelapse');
+
+    let rotation = 0;
+    function rotateImage(deg) {
+      rotation = (rotation + deg) % 360;
+      artImg.style.transform = `rotate(${rotation}deg)`;
+    }
+
+    fetch('/data/artdata.json')
+      .then(res => res.json())
+      .then(data => {
+        const art = data.find(item => item.id === artId);
+        if (!art) {
+          titleEl.textContent = 'Artwork Not Found';
+          return;
+        }
+
+        titleEl.textContent = art.title || artId;
+        artImg.src = art.full;
+        artImg.alt = art.title;
+        descEl.textContent = art.description || '';
+        downloadEl.href = art.highres || art.full;
+
+        if (art.timelapse) {
+          videoEl.src = art.timelapse;
+          videoEl.style.display = 'block';
+        }
+      })
+      .catch(err => {
+        titleEl.textContent = 'Error Loading Artwork';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
