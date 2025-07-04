@@ -5,75 +5,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gallery – AMObzid1an</title>
 
-  <style>
+<style>
   /* ─── page base ─────────────────────────────────────────── */
-  body{
-    margin:0;
-    font-family:sans-serif;
-    color:#e0e0e0;
-    background:url('/background.png') no-repeat center/cover fixed;
-    display:flex;flex-direction:column;align-items:center;min-height:100vh;
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    color: #e0e0e0;
+    background: url('/background.png') no-repeat center/cover fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
   }
-  h1{margin:2rem 0 .5rem;font-size:2rem;text-shadow:0 0 5px #000;}
+
+  h1 {
+    margin: 2rem 0 0.5rem;
+    font-size: 2rem;
+    text-shadow: 0 0 5px #000;
+  }
 
   /* ─── filter bar ────────────────────────────────────────── */
-<div id="filters">
-  <button data-group="type" data-value="all" class="active">All Media</button>
-  <button data-group="type" data-value="digital">Digital</button>
-  <button data-group="type" data-value="traditional">Hand-Drawn</button>
-</div>
+  #filters {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  #filters button {
+    padding: 6px 14px;
+    background: #333;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  #filters button.active {
+    background: #6600aa;
+    color: #fff;
+  }
+
+  #filters button:hover {
+    background: #444;
+  }
 
   /* ─── grid ──────────────────────────────────────────────── */
-  .gallery-grid{
-    width:90%;max-width:1400px;
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-    gap:22px;padding:2rem 0 4rem;
+  .gallery-grid {
+    width: 90%;
+    max-width: 1400px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 22px;
+    padding: 2rem 0 4rem;
   }
 
-/* ─── tile & image ─────────────────────────────────────── */
-.gallery-item img {
-  width: 100%;
-  height: auto;
-  max-height: 300px;       /* 👈 adjust to taste */
-  object-fit: contain;     /* letter-boxes tall images instead of cropping */
-  border-radius: 14px;
-  box-shadow: 0 0 3px rgba(0, 187, 255, 0.15), 0 0 18px rgba(0, 0, 0, 0.6);
-  transition: box-shadow 0.3s ease;
-}
+  /* ─── tile & image ─────────────────────────────────────── */
+  .gallery-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 
-.gallery-item:hover img {
-  box-shadow: 0 0 3px rgba(0, 187, 255, 0.6), 0 0 28px 8px rgba(0, 187, 255, 0.3);
-}
+  .gallery-item img {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 14px;
+    box-shadow: 0 0 3px rgba(0, 187, 255, 0.15), 0 0 18px rgba(0, 0, 0, 0.6);
+    transition: box-shadow 0.3s ease;
+  }
 
-/* ─── title ────────────────────────────────────────────── */
-.image-title {
-  margin-top: 0.4rem;
-  font-size: 0.8rem;
-  padding: 4px 8px;
-  background: rgba(0, 0, 0, 0.65);
-  border-radius: 6px;
-  max-width: 90%;
-  overflow-wrap: break-word;
-}
+  .gallery-item:hover img {
+    box-shadow: 0 0 3px rgba(0, 187, 255, 0.6), 0 0 28px 8px rgba(0, 187, 255, 0.3);
+  }
+
+  /* ─── title ────────────────────────────────────────────── */
+  .image-title {
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.65);
+    border-radius: 6px;
+    max-width: 90%;
+    overflow-wrap: break-word;
+  }
 
   /* ─── portals ──────────────────────────────────────────── */
-  .home-portal{position:fixed;top:20px;left:20px;z-index:10;width:90px;height:90px;}
-  .home-portal img{width:100%;border-radius:50%;animation:pulse 3s ease-in-out infinite;filter:drop-shadow(0 0 10px #2a0134);}
-  .credits-portal{position:fixed;bottom:20px;right:20px;z-index:12;width:70px;height:70px;}
-  .credits-portal img{width:100%;border-radius:50%;animation:pulse-glow 4s ease-in-out infinite;filter:drop-shadow(0 0 8px #7700ff);}
-  @keyframes pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 10px #6a0dad);}50%{transform:scale(1.1);filter:drop-shadow(0 0 18px #3a003d);}}
+  .home-portal {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    width: 90px;
+    height: 90px;
+  }
 
-  /* ─── light-box overlay ───────────────────────────────── */
-  #lightbox{
-    position:fixed;inset:0;display:none;align-items:center;justify-content:center;
-    background:rgba(0,0,0,.85);z-index:100;
+  .home-portal img {
+    width: 100%;
+    border-radius: 50%;
+    animation: pulse 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px #2a0134);
   }
-  #lightbox img{
-    max-width:90vw;max-height:90vh;cursor:pointer;
-    transition:transform .3s ease;
+
+  .credits-portal {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 12;
+    width: 70px;
+    height: 70px;
   }
-  </style>
+
+  .credits-portal img {
+    width: 100%;
+    border-radius: 50%;
+    animation: pulse-glow 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px #7700ff);
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 10px #6a0dad);
+    }
+    50% {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 18px #3a003d);
+    }
+  }
+</style>
 </head>
 <body>
 
