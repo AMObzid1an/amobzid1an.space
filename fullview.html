@@ -1,134 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Artwork Viewer – AMObzid1an</title>
-  <style>
-    body {
-      margin: 0;
-      background: url('/background.png') no-repeat center/cover fixed;
-      font-family: sans-serif;
-      color: #e0e0e0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem 1rem;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Artwork Viewer – AMObzid1an</title>
+<style>
+  :root {
+    --ui-bg: rgba(0,0,0,0.55);
+    --ui-border: rgba(255,255,255,0.14);
+    --brand: #7700ff;
+  }
+  body{
+    margin:0; font-family:sans-serif; color:#e0e0e0;
+    background:url('/background.png') no-repeat center/cover fixed;
+    display:flex; flex-direction:column; align-items:center;
+    min-height:100vh; padding:2rem 1rem;
+  }
+  h1{ margin:0 0 1rem; text-shadow:0 0 5px #000; }
 
-    h1 {
-      margin-bottom: 1rem;
-      text-shadow: 0 0 5px #000;
-    }
+  .image-wrap{
+    display:flex; flex-direction:column; align-items:center;
+    gap:.6rem;
+  }
+  .art-image{
+    max-width:90vw; max-height:78vh; display:block;
+    border-radius:14px; box-shadow:0 0 18px rgba(0,0,0,.6);
+    cursor:zoom-in;
+    transition:transform .25s ease;
+  }
 
-    .image-container {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
+  .controls{
+    display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center;
+  }
+  .btn{
+    padding:.55rem .9rem; border-radius:10px;
+    border:1px solid var(--ui-border); background:#222;
+    color:#e0e0e0; cursor:pointer; text-decoration:none;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .btn:hover{ background:var(--brand); border-color:rgba(255,255,255,.38); }
 
-    .art-image {
-      max-width: 90vw;
-      max-height: 80vh;
-      border-radius: 14px;
-      box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
-      transition: transform 0.3s ease;
-    }
+  .desc{
+    margin-top:1rem; max-width:860px;
+    background:rgba(0,0,0,.5); border:1px solid var(--ui-border);
+    border-radius:10px; padding:1rem; text-align:center;
+  }
 
-    .controls {
-      display: flex;
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    button, a.download-btn {
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      background: #222;
-      color: #e0e0e0;
-      border: 1px solid #555;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.25s;
-    }
-
-    button:hover, .download-btn:hover {
-      background: #7700ff;
-    }
-
-    .description {
-      background: rgba(0, 0, 0, 0.5);
-      padding: 1rem;
-      border-radius: 10px;
-      max-width: 700px;
-      margin-top: 1.5rem;
-      text-align: center;
-    }
-
-    video {
-      margin-top: 2rem;
-      max-width: 90vw;
-      border-radius: 10px;
-    }
-  </style>
+  /* --- Zoom overlay --- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.7);
+    display:none; align-items:center; justify-content:center;
+    z-index:1000;
+  }
+  .overlay.open{ display:flex; }
+  .overlay-canvas{
+    position:relative; width:92vw; height:90vh; border-radius:12px;
+    background:rgba(0,0,0,.35); border:1px solid var(--ui-border);
+    overflow:hidden; cursor:grab;
+  }
+  .overlay-canvas.grabbing{ cursor:grabbing; }
+  .overlay-img{
+    position:absolute; left:50%; top:50%;
+    transform-origin:0 0; /* we’ll do our own centering */
+    user-select:none; -webkit-user-drag:none; pointer-events:none;
+    max-width:none; max-height:none;
+  }
+  .overlay-ui{
+    position:absolute; top:8px; right:8px; display:flex; gap:.4rem; z-index:2;
+  }
+  .toast{
+    position:absolute; left:50%; bottom:12px; transform:translateX(-50%);
+    background:rgba(0,0,0,.75); border:1px solid var(--ui-border);
+    border-radius:10px; padding:.6rem .9rem; font-size:.9rem;
+    opacity:.95;
+  }
+</style>
 </head>
 <body>
-  <h1 id="art-title">Loading...</h1>
+  <h1 id="title">Loading…</h1>
 
-  <div class="image-container">
-    <img id="art-img" class="art-image" src="" alt="Artwork" />
+  <div class="image-wrap">
+    <img id="img" class="art-image" alt="Artwork"/>
     <div class="controls">
-      <button onclick="rotateImage(-90)">↺ Rotate Left</button>
-      <button onclick="rotateImage(90)">↻ Rotate Right</button>
-      <a id="download-link" class="download-btn" href="#" download>Download HQ</a>
+      <button id="rotL" class="btn" hidden>↺ Rotate Left</button>
+      <button id="rotR" class="btn" hidden>↻ Rotate Right</button>
+      <a id="download" class="btn" href="#" download>Download</a>
+      <a class="btn" href="/gallery.html">Back to Gallery</a>
     </div>
   </div>
 
-  <div class="description" id="art-description"></div>
+  <div class="desc" id="desc"></div>
 
-  <video id="timelapse" controls style="display:none"></video>
+  <!-- Zoom overlay -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <div class="overlay-canvas" id="canvas">
+      <div class="overlay-ui" id="overlayControls">
+        <button id="oRotL" class="btn">↺</button>
+        <button id="oRotR" class="btn">↻</button>
+        <button id="oClose" class="btn">Esc ✕</button>
+      </div>
+      <img id="oImg" class="overlay-img" alt="Zoomed Artwork"/>
+      <div class="toast" id="toast">Scroll to zoom · drag to pan · Esc to exit</div>
+    </div>
+  </div>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const artId = params.get('id');
-    const artImg = document.getElementById('art-img');
-    const titleEl = document.getElementById('art-title');
-    const descEl = document.getElementById('art-description');
-    const downloadEl = document.getElementById('download-link');
-    const videoEl = document.getElementById('timelapse');
+<script>
+  // --- Params from Gallery ---
+  const params = new URLSearchParams(location.search);
+  const src  = params.get('src');          // full image URL
+  const title= params.get('title') || '';
+  const orientation = params.get('orientation') || 'fixed'; // pass this from gallery if desired
+  const desc = params.get('desc') || '';   // optional
 
-    let rotation = 0;
-    function rotateImage(deg) {
-      rotation = (rotation + deg) % 360;
-      artImg.style.transform = `rotate(${rotation}deg)`;
+  // --- Elements ---
+  const titleEl = document.getElementById('title');
+  const imgEl   = document.getElementById('img');
+  const dlEl    = document.getElementById('download');
+  const descEl  = document.getElementById('desc');
+
+  const rotL = document.getElementById('rotL');
+  const rotR = document.getElementById('rotR');
+
+  // Overlay elements
+  const overlay = document.getElementById('overlay');
+  const canvas  = document.getElementById('canvas');
+  const oImg    = document.getElementById('oImg');
+  const oRotL   = document.getElementById('oRotL');
+  const oRotR   = document.getElementById('oRotR');
+  const oClose  = document.getElementById('oClose');
+  const toast   = document.getElementById('toast');
+
+  // --- Init basic view ---
+  if (!src) {
+    titleEl.textContent = 'Artwork Not Found';
+  } else {
+    titleEl.textContent = decodeURIComponent(title);
+    imgEl.src = src;
+    imgEl.alt = titleEl.textContent || 'Artwork';
+    dlEl.href = src;
+    descEl.textContent = decodeURIComponent(desc);
+  }
+
+  // Show rotate buttons only for wild/flippable
+  const canRotate = (orientation === 'wild' || orientation === 'flippable');
+  if (canRotate) { rotL.hidden = rotR.hidden = false; }
+
+  // --- Inline rotation (non-zoom view) ---
+  let baseRotation = 0;
+  function applyInlineRotation() {
+    imgEl.style.transform = `rotate(${baseRotation}deg)`;
+  }
+  rotL.addEventListener('click', () => { baseRotation = (baseRotation - 90) % 360; applyInlineRotation(); });
+  rotR.addEventListener('click', () => { baseRotation = (baseRotation + 90) % 360; applyInlineRotation(); });
+
+  // --- Zoom Overlay Logic ---
+  let z = 1;                 // scale
+  let tx = 0, ty = 0;        // pan translate
+  let oRot = 0;              // overlay rotation
+  let dragging = false, lastX = 0, lastY = 0;
+
+  function openOverlay() {
+    if (!src) return;
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden','false');
+    oImg.src = src;
+    oRot = baseRotation;     // start with inline rotation
+    z = 1; tx = ty = 0;
+    centerImage();
+    draw();
+    // one-time helper
+    if (!sessionStorage.getItem('fv_toast_seen')) {
+      toast.style.display = 'block';
+      setTimeout(()=> toast.style.display='none', 3200);
+      sessionStorage.setItem('fv_toast_seen','1');
+    } else {
+      toast.style.display = 'none';
     }
+    // toggle overlay rotate buttons
+    document.getElementById('overlayControls').style.display = canRotate ? 'flex' : 'none';
+  }
 
-    fetch('/data/artdata.json')
-      .then(res => res.json())
-      .then(data => {
-        const art = data.find(item => item.id === artId);
-        if (!art) {
-          titleEl.textContent = 'Artwork Not Found';
-          return;
-        }
+  function closeOverlay() {
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden','true');
+  }
 
-        titleEl.textContent = art.title || artId;
-        artImg.src = art.full;
-        artImg.alt = art.title;
-        descEl.textContent = art.description || '';
-        downloadEl.href = art.highres || art.full;
+  function centerImage() {
+    // center the (0,0) of the image to canvas center
+    const rect = canvas.getBoundingClientRect();
+    tx = rect.width / 2;
+    ty = rect.height / 2;
+  }
 
-        if (art.timelapse) {
-          videoEl.src = art.timelapse;
-          videoEl.style.display = 'block';
-        }
-      })
-      .catch(err => {
-        titleEl.textContent = 'Error Loading Artwork';
-        console.error(err);
-      });
-  </script>
+  function draw() {
+    // Compose transform: translate to center, then scale, then rotate
+    oImg.style.transform = `translate(${tx}px, ${ty}px) rotate(${oRot}deg) scale(${z})`;
+    // Move origin to image center by offsetting half of its natural size (done via CSS origin 0,0 + translate)
+    // We'll compute offset on load to keep the image centered visually:
+  }
+
+  // Adjust origin offset once we know natural size
+  oImg.addEventListener('load', () => {
+    // set origin to the image's center by translating -w/2, -h/2
+    const w = oImg.naturalWidth || 1;
+    const h = oImg.naturalHeight || 1;
+    oImg.style.left = '0px';
+    oImg.style.top  = '0px';
+    // use CSS var via transform concatenation:
+    oImg.style.transform = ''; // reset before first draw
+    // store half sizes for draw math
+    oImg.dataset.hw = (w/2).toString();
+    oImg.dataset.hh = (h/2).toString();
+    draw();
+  });
+
+  // Overwrite draw to include half-size offset (kept separate for clarity)
+  function draw(){
+    const hw = parseFloat(oImg.dataset.hw || '0');
+    const hh = parseFloat(oImg.dataset.hh || '0');
+    oImg.style.transform =
+      `translate(${tx - hw}px, ${ty - hh}px) rotate(${oRot}deg) scale(${z})`;
+  }
+
+  // Wheel zoom (centered around cursor)
+  canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    const zoomFactor = (e.deltaY < 0) ? 1.12 : 1/1.12;
+    const newZ = Math.min(10, Math.max(0.2, z * zoomFactor));
+
+    // adjust pan so the point under cursor stays under cursor
+    tx = mx - (mx - tx) * (newZ / z);
+    ty = my - (my - ty) * (newZ / z);
+
+    z = newZ;
+    draw();
+  }, { passive:false });
+
+  // Drag to pan
+  canvas.addEventListener('mousedown', (e) => {
+    dragging = true; canvas.classList.add('grabbing');
+    lastX = e.clientX; lastY = e.clientY;
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    tx += (e.clientX - lastX);
+    ty += (e.clientY - lastY);
+    lastX = e.clientX; lastY = e.clientY;
+    draw();
+  });
+  window.addEventListener('mouseup', () => { dragging = false; canvas.classList.remove('grabbing'); });
+
+  // Rotation inside overlay
+  oRotL.addEventListener('click', () => { oRot = (oRot - 90) % 360; draw(); });
+  oRotR.addEventListener('click', () => { oRot = (oRot + 90) % 360; draw(); });
+
+  // Open/close wiring
+  imgEl.addEventListener('click', openOverlay);
+  oClose.addEventListener('click', closeOverlay);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeOverlay(); // click outside canvas closes
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeOverlay();
+  });
+
+</script>
 </body>
 </html>
