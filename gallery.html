@@ -5,233 +5,161 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gallery – AMObzid1an</title>
 
-<style>
-  /* ─── page base ─────────────────────────────────────────── */
-  body {
-    margin: 0;
-    font-family: sans-serif;
-    color: #e0e0e0;
-    background: url('/background.png') no-repeat center/cover fixed;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-  }
-
-  h1 {
-    margin: 2rem 0 0.5rem;
-    font-size: 2rem;
-    text-shadow: 0 0 5px #000;
-  }
-
-  /* ─── filter bar ────────────────────────────────────────── */
-  #filters {
-    margin-bottom: 1rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  #filters button {
-    padding: 6px 14px;
-    background: #333;
-    color: #eee;
-    border: 1px solid #555;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-
-  #filters button.active {
-    background: #6600aa;
-    color: #fff;
-  }
-
-  #filters button:hover {
-    background: #444;
-  }
-
-  /* ─── grid ──────────────────────────────────────────────── */
-  .gallery-grid {
-    width: 90%;
-    max-width: 1400px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 22px;
-    padding: 2rem 0 4rem;
-  }
-
-  /* ─── tile & image ─────────────────────────────────────── */
-  .gallery-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .gallery-item img {
-    width: 100%;
-    height: auto;
-    max-height: 300px;
-    object-fit: contain;
-    border-radius: 14px;
-    box-shadow: 0 0 3px rgba(0, 187, 255, 0.15), 0 0 18px rgba(0, 0, 0, 0.6);
-    transition: box-shadow 0.3s ease;
-  }
-
-  .gallery-item:hover img {
-    box-shadow: 0 0 3px rgba(0, 187, 255, 0.6), 0 0 28px 8px rgba(0, 187, 255, 0.3);
-  }
-
-  .gallery-item:focus {
-  outline: none;
-  box-shadow: 0 0 8px 3px rgba(187, 255, 255, 0.4); /* or whatever glow you want */
-}
-  /* ─── title ────────────────────────────────────────────── */
-  .image-title {
-    margin-top: 0.4rem;
-    font-size: 0.8rem;
-    padding: 4px 8px;
-    background: rgba(0, 0, 0, 0.65);
-    border-radius: 6px;
-    max-width: 90%;
-    overflow-wrap: break-word;
-  }
-
-  /* ─── portals ──────────────────────────────────────────── */
-  .home-portal {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 10;
-    width: 90px;
-    height: 90px;
-  }
-
-  .home-portal img {
-    width: 100%;
-    border-radius: 50%;
-    animation: pulse 3s ease-in-out infinite;
-    filter: drop-shadow(0 0 10px #2a0134);
-  }
-
-  .credits-portal {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 12;
-    width: 70px;
-    height: 70px;
-  }
-
-  .credits-portal img {
-    width: 100%;
-    border-radius: 50%;
-    animation: pulse-glow 4s ease-in-out infinite;
-    filter: drop-shadow(0 0 8px #7700ff);
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-      filter: drop-shadow(0 0 10px #6a0dad);
+  <style>
+    /* ─── page base ─────────────────────────────────────────── */
+    body{
+      margin:0;font-family:sans-serif;color:#e0e0e0;
+      background:url('/background.png') no-repeat center/cover fixed;
+      display:flex;flex-direction:column;align-items:center;min-height:100vh;
     }
-    50% {
-      transform: scale(1.1);
-      filter: drop-shadow(0 0 18px #3a003d);
+    h1{margin:2rem 0 .5rem;font-size:2rem;text-shadow:0 0 5px #000;}
+
+    /* ─── filter bar (type only) ───────────────────────────── */
+    #filters{margin-bottom:1rem;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;}
+    #filters button{
+      padding:6px 14px;background:#333;color:#eee;border:1px solid #555;border-radius:6px;
+      cursor:pointer;transition:background .2s ease;
     }
-  }
-</style>
+    #filters button.active{background:#6600aa;color:#fff;}
+    #filters button:hover{background:#444;}
+
+    /* ─── grid ──────────────────────────────────────────────── */
+    .gallery-grid{
+      width:90%;max-width:1400px;display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+      gap:22px;padding:2rem 0 4rem;
+    }
+
+    /* ─── tile + “stage” to clip rotations ─────────────────── */
+    .gallery-item{display:flex;flex-direction:column;align-items:center;text-align:center;}
+    .thumb-stage{
+      height:300px;          /* tile height; tweak to taste */
+      width:100%;
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;border-radius:14px;
+      box-shadow:0 0 3px rgba(0,187,255,.15),0 0 18px rgba(0,0,0,.6);
+      transition:box-shadow .3s ease;
+    }
+    .gallery-item:hover .thumb-stage{
+      box-shadow:0 0 3px rgba(0,187,255,.6),0 0 28px 8px rgba(0,187,255,.3);
+    }
+    .thumb-stage img{
+      max-width:100%;max-height:100%;
+      object-fit:contain;transform-origin:50% 50%;
+      transition:transform .25s ease;
+    }
+
+    /* caption */
+    .image-title{
+      margin-top:.4rem;font-size:.8rem;padding:4px 8px;
+      background:rgba(0,0,0,.65);border-radius:6px;max-width:90%;
+      overflow-wrap:break-word;text-shadow:0 1px 2px rgba(0,0,0,.6);
+    }
+
+    /* focus outline tweak */
+    .gallery-item:focus{outline:none;}
+
+    /* portals */
+    .home-portal{position:fixed;top:20px;left:20px;z-index:10;width:90px;height:90px;}
+    .home-portal img{width:100%;border-radius:50%;animation:pulse 3s ease-in-out infinite;filter:drop-shadow(0 0 10px #2a0134);}
+    .credits-portal{position:fixed;bottom:20px;right:20px;z-index:12;width:70px;height:70px;}
+    .credits-portal img{width:100%;border-radius:50%;animation:pulse 4s ease-in-out infinite;filter:drop-shadow(0 0 8px #7700ff);}
+    @keyframes pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 10px #6a0dad);}50%{transform:scale(1.1);filter:drop-shadow(0 0 18px #3a003d);}}
+  </style>
 </head>
 <body>
 
-<!-- home portal -->
-<a class="home-portal" href="/"><img src="Portal.png" alt="Home"></a>
+  <!-- home portal -->
+  <a class="home-portal" href="/"><img src="Portal.png" alt="Home"></a>
 
-<h1>Gallery</h1>
+  <h1>Gallery</h1>
 
-<!-- filters -->
-<div id="filters">
-  <button data-group="type" data-value="all" class="active">All Media</button>
-  <button data-group="type" data-value="digital">Digital</button>
-  <button data-group="type" data-value="traditional">Hand-Drawn</button>
-  <button data-group="orientation" data-value="all" class="active">Any Orientation</button>
-  <button data-group="orientation" data-value="fixed">Fixed</button>
-  <button data-group="orientation" data-value="flippable">Flippable</button>
-  <button data-group="orientation" data-value="wild">Wild</button>
-</div>
+  <!-- filters (type only) -->
+  <div id="filters">
+    <button data-group="type" data-value="all" class="active">All Media</button>
+    <button data-group="type" data-value="digital">Digital</button>
+    <button data-group="type" data-value="traditional">Hand-Drawn</button>
+  </div>
 
-<!-- grid -->
-<div class="gallery-grid" id="galleryGrid"></div>
+  <!-- grid -->
+  <div class="gallery-grid" id="galleryGrid"></div>
 
-<!-- light-box -->
-<div id="lightbox"><img id="lightboxImg" src="" alt="Full view"></div>
+  <script>
+    /* manifest */
+    const images = [
+      {thumb:'/assets/gallery/thumbs/85-Verde-Lunaris.jpg', full:'/assets/gallery/full/85-Verde-Lunaris.jpg', title:'85 Verde-Lunaris', type:'digital'},
+      {thumb:'/assets/gallery/thumbs/XJ-210.jpg',           full:'/assets/gallery/full/XJ-210.jpg',           title:'XJ-210',          type:'digital'},
+      {thumb:'/assets/gallery/thumbs/UX-214.jpg',           full:'/assets/gallery/full/UX-214.jpg',           title:'UX-214',          type:'digital'},
+      {thumb:'/assets/gallery/thumbs/105a-Seraphim-Vector.jpg', full:'/assets/gallery/full/105a-Seraphim-Vector.jpg', title:'105a Seraphim Vector', type:'digital'},
+      {thumb:'/assets/gallery/thumbs/109-Selenae-Drift.jpg',    full:'/assets/gallery/full/109-Selenae-Drift.jpg',    title:'109 Selenae Drift',    type:'digital'},
+      {thumb:'/assets/gallery/thumbs/N217-Hx.jpg',              full:'/assets/gallery/full/N217-Hx.jpg',              title:'N217-Hx',              type:'digital'},
+      {thumb:'/assets/gallery/thumbs/Aurum-221.jpg',            full:'/assets/gallery/full/Aurum-221.jpg',            title:'Aurum-221',            type:'digital'},
+      {thumb:'/assets/gallery/thumbs/Oculus-212.jpg',           full:'/assets/gallery/full/Oculus-212.jpg',           title:'Oculus-212',           type:'digital'},
+      {thumb:'/assets/gallery/thumbs/Iris-190.jpg',             full:'/assets/gallery/full/Iris-190.jpg',             title:'Iris-190',             type:'digital'}
+    ];
 
-<script>
-/* ── manifest ── */
-const images = [
-  {thumb:'/assets/gallery/thumbs/85-Verde-Lunaris.jpg', full:'/assets/gallery/full/85-Verde-Lunaris.jpg', title:'85 Verde-Lunaris', type:'digital'},
-  {thumb:'/assets/gallery/thumbs/XJ-210.jpg',           full:'/assets/gallery/full/XJ-210.jpg',           title:'XJ-210',          type:'digital',},
-  {thumb:'/assets/gallery/thumbs/UX-214.jpg',           full:'/assets/gallery/full/UX-214.jpg',           title:'UX-214',          type:'digital',},
-  {thumb:'/assets/gallery/thumbs/105a-Seraphim-Vector.jpg', full:'/assets/gallery/full/105a-Seraphim-Vector.jpg', title:'105a Seraphim Vector', type:'digital'},
-  {thumb:'/assets/gallery/thumbs/109-Selenae-Drift.jpg',    full:'/assets/gallery/full/109-Selenae-Drift.jpg',    title:'109 Selenae Drift',    type:'digital',},
-  {thumb:'/assets/gallery/thumbs/N217-Hx.jpg',              full:'/assets/gallery/full/N217-Hx.jpg',              title:'N217-Hx',              type:'digital',},
-  {thumb:'/assets/gallery/thumbs/Aurum-221.jpg',            full:'/assets/gallery/full/Aurum-221.jpg',            title:'Aurum-221',            type:'digital',},
-  {thumb:'/assets/gallery/thumbs/Oculus-212.jpg',           full:'/assets/gallery/full/Oculus-212.jpg',           title:'Oculus-212',           type:'digital',},
-  {thumb:'/assets/gallery/thumbs/Iris-190.jpg',             full:'/assets/gallery/full/Iris-190.jpg',             title:'Iris-190',             type:'digital',}
-];
+    /* shuffle */
+    for (let i = images.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [images[i], images[j]] = [images[j], images[i]];
+    }
 
-/* shuffle */
-for(let i=images.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[images[i],images[j]]=[images[j],images[i]];}
+    /* render with random orientation inside a clipped stage */
+    const grid = document.getElementById('galleryGrid');
+    const angles = [0, 90, 180, 270];
 
-/* ── render tiles ───────────────────────────── */
-const grid = document.getElementById('galleryGrid');
-images.forEach(({thumb, full, title, type}) => {
-  const link = document.createElement('a');
-  link.href = `fullview.html?src=${encodeURIComponent(full)}&title=${encodeURIComponent(title || '')}`;
-  link.className = 'gallery-item';
-  link.dataset.type = type;
+    images.forEach(({thumb, full, title, type}) => {
+      const link = document.createElement('a');
+      link.href = `fullview.html?src=${encodeURIComponent(full)}&title=${encodeURIComponent(title || '')}`;
+      link.className = 'gallery-item';
+      link.dataset.type = type;
 
-  const img = document.createElement('img');
-  img.src = thumb;
-  img.alt = title || 'Artwork'; // thumbnails stay upright
+      const stage = document.createElement('div');
+      stage.className = 'thumb-stage';
 
-  const cap = document.createElement('div');
-  cap.className = 'image-title';
-  cap.textContent = title || '';
+      const img = document.createElement('img');
+      img.src = thumb;
+      img.alt = title || 'Artwork';
+      img.loading = 'lazy';
 
-  link.appendChild(img);
-  link.appendChild(cap);
-  grid.appendChild(link);
-});
+      const angle = angles[Math.floor(Math.random()*angles.length)];
+      const needsScale = angle % 180 !== 0 ? ' scale(0.9)' : '';
+      img.style.transform = `rotate(${angle}deg)${needsScale}`;
 
-/* ── filtering ─────────────────────────────── */
-const state = { type: 'all' };
-document.querySelectorAll('#filters button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const { group, value } = btn.dataset;
-    document.querySelectorAll(`#filters button[data-group="${group}"]`)
-      .forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    state[group] = value;
-    applyFilters();
-  });
-});
+      const cap = document.createElement('div');
+      cap.className = 'image-title';
+      cap.textContent = title || '';
 
-function applyFilters() {
-  document.querySelectorAll('.gallery-item').forEach(item => {
-    const okType = state.type === 'all' || item.dataset.type === state.type;
-    item.style.display = okType ? 'block' : 'none';
-  });
-}
-/* close on backdrop click */
-lb.addEventListener('click', e=>{ if(e.target===lb) lb.style.display='none'; });
-</script>
+      stage.appendChild(img);
+      link.appendChild(stage);
+      link.appendChild(cap);
+      grid.appendChild(link);
+    });
 
-<!-- credits portal -->
-<a class="credits-portal" href="/credits.html" target="_blank" title="Usage & Credits">
-  <img src="Portal.png" alt="Credits">
-</a>
+    /* filtering (type only) */
+    const state = { type: 'all' };
+    document.querySelectorAll('#filters button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const { group, value } = btn.dataset;
+        document.querySelectorAll(`#filters button[data-group="${group}"]`)
+          .forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state[group] = value;
+        applyFilters();
+      });
+    });
+
+    function applyFilters(){
+      document.querySelectorAll('.gallery-item').forEach(item => {
+        const okType = state.type === 'all' || item.dataset.type === state.type;
+        item.style.display = okType ? 'block' : 'none';
+      });
+    }
+  </script>
+
+  <!-- credits portal -->
+  <a class="credits-portal" href="/credits.html" target="_blank" title="Usage & Credits">
+    <img src="Portal.png" alt="Credits">
+  </a>
 </body>
 </html>
