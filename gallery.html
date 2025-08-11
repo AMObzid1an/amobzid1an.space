@@ -54,20 +54,19 @@
   #filters button.active{background:#6600aa;color:#fff;}
   #filters button:hover{background:#444;}
 
-  /* =========================
-     SECTION C: GRID
-  ========================== */
-  .gallery-grid{
-    width:90%;max-width:1400px;display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-    gap:26px; /* wider to avoid “kissing edges” */
-    padding:2rem 0 4rem;
-  }
+ .gallery-grid{
+  width:90%;max-width:1400px;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:26px;
+  padding:2rem 0 4rem;
+  box-sizing:border-box;
+}
+
 
 /* =========================
    SECTION D: TILE + STAGE
-   - Stage only clips/centers
-   - Glow/border live on the IMG
+   - Stage now sizes to the rotated image via aspect-ratio
+   - Rotor handles the transform; border/glow stay crisp
 ========================== */
 .gallery-item{
   display:block;
@@ -76,43 +75,53 @@
   -webkit-tap-highlight-color:transparent;
 }
 
-/* Stage: no box-shadow here */
+/* Stage: no fixed height; aspect-ratio is set inline from JS */
 .thumb-stage{
-  height:300px;               /* tile height */
   width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  /* height removed */
+  display:block;
+  position:relative;
   overflow:hidden;
   border-radius:14px;
-  padding:8px;                /* breathing room between neighbors */
   background:rgba(0,0,0,.25);
+  padding:0;                 /* stage is now edge-to-edge; glow is on stage */
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 0 0 0 rgba(0,187,255,0);
+  transition:box-shadow .25s ease, transform .2s ease, border-color .25s ease;
 }
 
-/* Border/Glow moves onto the IMAGE so it “wraps” the art */
-.thumb-stage img{
+/* Inner rotor centers the image and applies the rotation */
+.thumb-rotor{
+  position:absolute; inset:0;
+  display:grid; place-items:center;
+  transform-origin:50% 50%;
+}
+
+/* The image itself is just content; no box-shadow here */
+.thumb-rotor img{
   max-width:100%;
   max-height:100%;
+  width:auto; height:auto;
   object-fit:contain;
-  transform-origin:50% 50%;
-  transition:transform .25s ease, box-shadow .3s ease;
+  display:block;
   border-radius:12px;
-
-  /* default subtle “border” */
-  box-shadow:0 0 0 3px rgba(0,187,255,.15), 0 0 18px rgba(0,0,0,.6);
 }
 
-/* Hover = stronger glow on the image itself */
-.gallery-item:hover .thumb-stage img{
+/* Hover glow lives on the stage so it hugs the actual edges */
+.gallery-item:hover .thumb-stage{
+  border-color:rgba(0,187,255,.45);
   box-shadow:0 0 0 3px rgba(0,187,255,.6), 0 0 28px 8px rgba(0,187,255,.3);
 }
 
-/* Focus ring also on the image so it hugs perfectly */
-.gallery-item:focus{outline:none;}
-.gallery-item:focus-within .thumb-stage img,
-.gallery-item:focus .thumb-stage img{
+/* Keyboard focus */
+.gallery-item:focus{ outline:none; }
+.gallery-item:focus-within .thumb-stage,
+.gallery-item:focus .thumb-stage{
+  border-color:rgba(0,187,255,.6);
   box-shadow:0 0 0 3px rgba(0,187,255,.75), 0 0 28px 8px rgba(0,187,255,.35);
 }
+
 
 
   /* =========================
@@ -197,44 +206,72 @@
     [images[i], images[j]] = [images[j], images[i]];
   }
 
-  /* K3: RENDER TILES (stage wrapper + rotation) */
-  const grid = document.getElementById('galleryGrid');
-  const angles = [0, 90, 180, 270];
+ /* K3: RENDER TILES (stage + rotor + rotation + aspect sizing) */
+const grid = document.getElementById('galleryGrid');
+const angles = [0, 90, 180, 270];
 
-  images.forEach(({thumb, full, title, type, orientation = 'wild'}) => {
-    const link = document.createElement('a');
-    link.href = `fullview.html?src=${encodeURIComponent(full)}&title=${encodeURIComponent(title || '')}`;
-    link.className = 'gallery-item';
-    link.dataset.type = type;
-    link.dataset.orientation = orientation;
+images.forEach(({thumb, full, title, type, orientation = 'wild'}) => {
+  const link = document.createElement('a');
+  link.href = `fullview.html?src=${encodeURIComponent(full)}&title=${encodeURIComponent(title || '')}`;
+  link.className = 'gallery-item';
+  link.dataset.type = type;
+  link.dataset.orientation = orientation;
 
-    const stage = document.createElement('div');
-    stage.className = 'thumb-stage';
+  const stage = document.createElement('div');
+  stage.className = 'thumb-stage';
 
-    const img = document.createElement('img');
-    img.src = thumb;
-    img.alt = title || 'Artwork';
-    img.loading = 'lazy';
+  const rotor = document.createElement('div');
+  rotor.className = 'thumb-rotor';
 
-    // orientation logic
-    let rotation = 0;
-    if (orientation === 'wild') {
-      rotation = angles[Math.floor(Math.random() * angles.length)];
-    } else if (orientation === 'flippable') {
-      rotation = [0, 180][Math.floor(Math.random() * 2)];
-    } // fixed stays 0
-    const needsScale = rotation % 180 !== 0 ? ' scale(0.95)' : '';
-    img.style.transform = `rotate(${rotation}deg)${needsScale}`;
+  const img = document.createElement('img');
+  img.src = thumb;
+  img.alt = title || 'Artwork';
+  img.loading = 'lazy';
 
-    const cap = document.createElement('div');
-    cap.className = 'image-title';
-    cap.textContent = title || '';
+  // orientation logic
+  let rotation = 0;
+  if (orientation === 'wild') {
+    rotation = angles[Math.floor(Math.random() * angles.length)];
+  } else if (orientation === 'flippable') {
+    rotation = [0, 180][Math.floor(Math.random() * 2)];
+  } // fixed stays 0
 
-    stage.appendChild(img);
-    link.appendChild(stage);
-    link.appendChild(cap);
-    grid.appendChild(link);
+  // apply rotation on the rotor; mild scale if 90/270 for visual safety
+  const needsScale = rotation % 180 !== 0 ? ' scale(0.95)' : '';
+  rotor.style.transform = `rotate(${rotation}deg)${needsScale}`;
+
+  // once the image knows its real size, compute stage aspect-ratio to match rotation
+  img.addEventListener('load', () => {
+    const w = img.naturalWidth || 1;
+    const h = img.naturalHeight || 1;
+    const rotated = (rotation % 180 !== 0);
+
+    // final displayed aspect: width/height after rotation
+    const ratio = rotated ? (h / w) : (w / h);
+
+    // modern browsers: aspect-ratio
+    stage.style.aspectRatio = ratio > 0 ? String(ratio) : '';
+
+    // fallback (very old browsers): explicit height calculation
+    // queue microtask to ensure stage has a width from layout
+    queueMicrotask(() => {
+      if (!('aspectRatio' in document.body.style)) {
+        const width = stage.clientWidth || 1;
+        stage.style.height = (width / (ratio || 1)) + 'px';
+      }
+    });
   });
+
+  const cap = document.createElement('div');
+  cap.className = 'image-title';
+  cap.textContent = title || '';
+
+  rotor.appendChild(img);
+  stage.appendChild(rotor);
+  link.appendChild(stage);
+  link.appendChild(cap);
+  grid.appendChild(link);
+});
 
   /* K4: FILTERING (type + orientation) */
   const state = { type: 'all', orientation: 'all' };
@@ -266,4 +303,5 @@
   </a>
 </body>
 </html>
+
 
