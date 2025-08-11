@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Donate – AMObzid1an</title>
+
+  <style>
+  /* =========================
+     SECTION A: PAGE BASE
+  ========================== */
+  :root{
+    --glow:#00bbff;
+    --ink:#e0e0e0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding-top:46px;            /* makes room for topbar */
+    font-family:sans-serif; color:var(--ink);
+    background:url('/background.png') no-repeat center/cover fixed;
+    min-height:100vh; display:flex; flex-direction:column;
+  }
+
+  /* =========================
+     SECTION A1: TOP BAR (reuse everywhere)
+  ========================== */
+  .topbar{
+    position:fixed; top:0; left:0; right:0; height:40px;
+    background:rgba(0,0,0,.85);
+    display:flex; align-items:center; justify-content:flex-end;
+    padding:0 12px; z-index:1000;
+    backdrop-filter:saturate(120%) blur(2px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .topbar a{
+    color:#e0e0e0; text-decoration:none;
+    font-size:.9rem; padding:6px 10px; border-radius:6px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.06);
+    transition:background .2s, border-color .2s;
+    margin-left:8px;
+  }
+  .topbar a:hover{
+    background:rgba(0,187,255,.18);
+    border-color:rgba(0,187,255,.45);
+  }
+
+  /* =========================
+     SECTION B: HEADER
+  ========================== */
+  .wrap{ width:min(1200px,92%); margin:0 auto; padding:28px 0 100px; }
+  .hero{
+    text-align:center; margin-top:10px;
+    text-shadow:0 0 8px rgba(0,0,0,.6);
+  }
+  .hero h1{ font-size:2.1rem; margin:.25rem 0 .5rem; }
+  .hero p{ opacity:.9; margin:0 auto 1.2rem; max-width:700px; }
+
+  /* =========================
+     SECTION C: DONATION OPTIONS
+  ========================== */
+  .grid{
+    display:grid; gap:22px; margin-top:18px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+  .card{
+    background:rgba(0,0,0,.45);
+    border-radius:16px; padding:18px;
+    box-shadow:0 0 0 2px rgba(0,187,255,.15), 0 14px 40px rgba(0,0,0,.45);
+    transition:box-shadow .25s ease, transform .2s ease;
+  }
+  .card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 0 0 2px rgba(0,187,255,.5), 0 18px 55px rgba(0,0,0,.5);
+  }
+  .card h2{ margin:.25rem 0 .5rem; font-size:1.2rem; }
+  .card p{ opacity:.9; margin:.25rem 0 1rem; }
+
+  .btnrow{ display:flex; gap:10px; flex-wrap:wrap; }
+  .btn{
+    display:inline-block; text-decoration:none; color:var(--ink);
+    padding:8px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.06); cursor:pointer;
+    transition:background .2s, border-color .2s, transform .1s;
+  }
+  .btn:hover{ background:rgba(0,187,255,.18); border-color:rgba(0,187,255,.45);}
+  .btn:active{ transform:translateY(1px); }
+
+  .btn-primary{
+    border-color:rgba(0,187,255,.6);
+    box-shadow:0 0 12px rgba(0,187,255,.25) inset;
+  }
+
+  /* =========================
+     SECTION D: CHARITY LIST
+  ========================== */
+  .charities{
+    margin-top:10px;
+    background:rgba(0,0,0,.35);
+    border-radius:16px; padding:16px;
+    box-shadow:0 0 0 2px rgba(0,187,255,.12);
+  }
+  .charities h3{ margin:.25rem 0 8px; font-size:1.05rem; }
+  .charity-grid{
+    display:grid; gap:12px;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  }
+  .charity{
+    background:rgba(0,0,0,.4); border-radius:12px; padding:12px;
+    border:1px solid rgba(255,255,255,.12);
+  }
+  .charity a{ color:#e6f7ff; text-decoration:none; }
+  .charity a:hover{ text-decoration:underline; }
+
+  /* =========================
+     SECTION E: PORTALS
+  ========================== */
+  .home-portal{
+    position:fixed; top:20px; left:20px; z-index:10; width:90px; height:90px;
+  }
+  .home-portal img{
+    width:100%; border-radius:50%;
+    animation:pulse 3s ease-in-out infinite;
+    filter:drop-shadow(0 0 10px #2a0134);
+  }
+  .credits-portal{
+    position:fixed; bottom:20px; right:20px; z-index:12; width:70px; height:70px;
+  }
+  .credits-portal img{
+    width:100%; border-radius:50%;
+    animation:pulse 4s ease-in-out infinite;
+    filter:drop-shadow(0 0 8px #7700ff);
+  }
+  @keyframes pulse{
+    0%,100%{ transform:scale(1); filter:drop-shadow(0 0 10px #6a0dad); }
+    50%{ transform:scale(1.1); filter:drop-shadow(0 0 18px #3a003d); }
+  }
+
+  /* =========================
+     SECTION F: FOOTNOTE
+  ========================== */
+  .foot{
+    margin-top:18px; font-size:.9rem; opacity:.85;
+    background:rgba(0,0,0,.35);
+    border-radius:12px; padding:10px 12px;
+    border:1px solid rgba(255,255,255,.12);
+  }
+
+  /* mobile nudges */
+  @media (max-width:520px){
+    .btnrow{ gap:8px; }
+  }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar (reuse on every page) -->
+  <div class="topbar">
+    <a href="/gallery.html">Gallery</a>
+    <a href="/credits.html">Usage & Credits</a>
+    <a href="/donate.html" class="btn-primary">Donate</a>
+  </div>
+
+  <!-- Home portal -->
+  <a class="home-portal" href="/"><img src="Portal.png" alt="Home"></a>
+
+  <main class="wrap">
+    <!-- Headline -->
+    <header class="hero">
+      <h1>Support the Vessel</h1>
+      <p>Zero ads. No data selling. Your support keeps the portals glowing and funds new work.  
+         You can back <em>AMObzid1an</em> directly or donate to causes we care about.</p>
+    </header>
+
+    <!-- Donation Cards -->
+    <section class="grid" aria-label="Donation options">
+      <!-- Creator Support -->
+      <article class="card">
+        <h2>Donate to the Vessel</h2>
+        <p>Help power site hosting, art time, and future experiments. Thank you for fueling the weird. 💜</p>
+        <div class="btnrow">
+          <!-- TODO: Replace # with your links -->
+          <a class="btn btn-primary" href="#" target="_blank" rel="noopener">Ko-fi</a>
+          <a class="btn" href="#" target="_blank" rel="noopener">Stripe</a>
+          <a class="btn" href="mailto:contact@amobzid1an.space">Contact for other ways</a>
+        </div>
+      </article>
+
+      <!-- Subscriptions / ByteBox teaser -->
+      <article class="card">
+        <h2>ByteBox (coming soon)</h2>
+        <p>Curated drops of indie films, ambient/queer music, lo-fi games, and digital art. Intentional curation, no algorithms.</p>
+        <div class="btnrow">
+          <a class="btn" href="#" target="_blank" rel="noopener">Join the waitlist</a>
+        </div>
+      </article>
+    </section>
+
+    <!-- Charities -->
+    <section class="charities" aria-label="Charities">
+      <h3>Support These Causes</h3>
+      <div class="charity-grid">
+        <div class="charity">
+          <strong>LGBTQ+ Support</strong><br/>
+          <a href="https://www.thetrevorproject.org/donate/" target="_blank" rel="noopener">The Trevor Project</a><br/>
+          <a href="https://translifeline.org/donate/" target="_blank" rel="noopener">Trans Lifeline</a>
+        </div>
+        <div class="charity">
+          <strong>Homelessness</strong><br/>
+          <a href="https://endhomelessness.org/" target="_blank" rel="noopener">National Alliance to End Homelessness</a><br/>
+          <a href="https://www.siennanavigation.org/" target="_blank" rel="noopener">Local shelters (example)</a>
+        </div>
+        <div class="charity">
+          <strong>Environment</strong><br/>
+          <a href="https://www.rainforesttrust.org/donate/" target="_blank" rel="noopener">Rainforest Trust</a><br/>
+          <a href="https://oceanconservancy.org/donate/" target="_blank" rel="noopener">Ocean Conservancy</a>
+        </div>
+        <div class="charity">
+          <strong>Mental Health</strong><br/>
+          <a href="https://www.nami.org/About-NAMI/Donate-to-NAMI" target="_blank" rel="noopener">NAMI</a><br/>
+          <a href="https://www.crisistextline.org/donate/" target="_blank" rel="noopener">Crisis Text Line</a>
+        </div>
+      </div>
+      <p class="foot">These links are suggestions—always research what aligns with your values. I’ll add more as the constellation grows.</p>
+    </section>
+
+    <!-- License / Credits -->
+    <p class="foot">Using works from this site? Please read the <a href="/credits.html">Usage & Credits</a> page. Non-commercial with credit; contact me for commercial use.</p>
+  </main>
+
+  <!-- Credits / License portal -->
+  <a class="credits-portal" href="/credits.html" target="_blank" title="Usage & Credits">
+    <img src="Portal.png" alt="Credits">
+  </a>
+</body>
+</html>
