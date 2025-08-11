@@ -9,12 +9,37 @@
   /* =========================
      SECTION A: PAGE BASE
   ========================== */
+  body{ padding-top: 46px; } /* sits just below the 40px bar */
   body{
     margin:0;font-family:sans-serif;color:#e0e0e0;
     background:url('/background.png') no-repeat center/cover fixed;
     display:flex;flex-direction:column;align-items:center;min-height:100vh;
   }
   h1{margin:2rem 0 .5rem;font-size:2rem;text-shadow:0 0 5px #000;}
+/* =========================
+   SECTION A1: TOP BAR
+========================== */
+.topbar{
+  position:fixed; top:0; left:0; right:0;
+  height:40px;
+  background:rgba(0,0,0,.85);
+  display:flex; align-items:center; justify-content:flex-end;
+  padding:0 12px;
+  z-index:1000;
+  backdrop-filter:saturate(120%) blur(2px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.topbar a{
+  color:#e0e0e0; text-decoration:none;
+  font-size:.9rem; padding:6px 10px; border-radius:6px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
+  transition:background .2s ease, border-color .2s ease;
+}
+.topbar a:hover{
+  background:rgba(0,187,255,.18);
+  border-color:rgba(0,187,255,.45);
+}
 
   /* =========================
      SECTION B: FILTER BAR
@@ -39,38 +64,56 @@
     padding:2rem 0 4rem;
   }
 
-  /* =========================
-     SECTION D: TILE + STAGE
-     - Stage clips rotations
-     - Glow belongs to stage
-  ========================== */
-  .gallery-item{
-    display:block; /* anchor behaves like block */
-    text-decoration:none;color:inherit;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .thumb-stage{
-    height:300px;width:100%;
-    display:flex;align-items:center;justify-content:center;
-    overflow:hidden;border-radius:14px;padding:6px;
-    box-shadow:0 0 0 3px rgba(0,187,255,.15),0 0 18px rgba(0,0,0,.6);
-    transition:box-shadow .3s ease;
-    background:rgba(0,0,0,.25);
-  }
-  .gallery-item:hover .thumb-stage{
-    box-shadow:0 0 0 3px rgba(0,187,255,.6),0 0 28px 8px rgba(0,187,255,.3);
-  }
-  .thumb-stage img{
-    max-width:100%;max-height:100%;object-fit:contain;
-    transform-origin:50% 50%;transition:transform .25s ease;
-  }
+/* =========================
+   SECTION D: TILE + STAGE
+   - Stage only clips/centers
+   - Glow/border live on the IMG
+========================== */
+.gallery-item{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+  -webkit-tap-highlight-color:transparent;
+}
 
-  /* focus ring moves to stage so it wraps perfectly */
-  .gallery-item:focus{outline:none;}
-  .gallery-item:focus-within .thumb-stage,
-  .gallery-item:focus .thumb-stage{
-    box-shadow:0 0 0 3px rgba(0,187,255,.75),0 0 28px 8px rgba(0,187,255,.35);
-  }
+/* Stage: no box-shadow here */
+.thumb-stage{
+  height:300px;               /* tile height */
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-radius:14px;
+  padding:8px;                /* breathing room between neighbors */
+  background:rgba(0,0,0,.25);
+}
+
+/* Border/Glow moves onto the IMAGE so it “wraps” the art */
+.thumb-stage img{
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  transform-origin:50% 50%;
+  transition:transform .25s ease, box-shadow .3s ease;
+  border-radius:12px;
+
+  /* default subtle “border” */
+  box-shadow:0 0 0 3px rgba(0,187,255,.15), 0 0 18px rgba(0,0,0,.6);
+}
+
+/* Hover = stronger glow on the image itself */
+.gallery-item:hover .thumb-stage img{
+  box-shadow:0 0 0 3px rgba(0,187,255,.6), 0 0 28px 8px rgba(0,187,255,.3);
+}
+
+/* Focus ring also on the image so it hugs perfectly */
+.gallery-item:focus{outline:none;}
+.gallery-item:focus-within .thumb-stage img,
+.gallery-item:focus .thumb-stage img{
+  box-shadow:0 0 0 3px rgba(0,187,255,.75), 0 0 28px 8px rgba(0,187,255,.35);
+}
+
 
   /* =========================
      SECTION E: CAPTION
@@ -101,6 +144,9 @@
   </style>
 </head>
 <body>
+<div class="topbar">
+  <a href="/donate.html">Donate</a>
+</div>
 
   <!-- =========================
        SECTION H: PORTAL + TITLE
@@ -220,3 +266,4 @@
   </a>
 </body>
 </html>
+
