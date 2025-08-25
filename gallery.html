@@ -92,7 +92,22 @@
     display:flex; align-items:center; justify-content:center;
     transform-origin:50% 50%;
   }
+/* Size strategy switches based on rotation parity */
+.thumb-rotor.rot-even img{  /* 0° or 180° */
+  width:100%;
+  height:auto;
+  max-width:100%;
+  max-height:100%;
+}
 
+.thumb-rotor.rot-odd img{   /* 90° or 270° */
+  height:100%;
+  width:auto;
+  max-width:100%;
+  max-height:100%;
+}
+
+    
   .thumb-rotor img{
     max-width:100%; 
     max-height:100%;
@@ -226,7 +241,7 @@ for (let i = images.length - 1; i > 0; i--) {
   [images[i], images[j]] = [images[j], images[i]];
 }
 
-/* Render */
+/* K3: RENDER TILES (rotation-aware sizing + aspect ratio from natural size) */
 const grid = document.getElementById('galleryGrid');
 const angles = [0, 90, 180, 270];
 
@@ -248,8 +263,44 @@ images.forEach(({thumb, full, title, type, orientation = 'wild'}) => {
   img.alt = title || 'Artwork';
   img.src = thumb;
 
-  // Pick angle based on orientation
+  // pick rotation
   let rotation = 0;
+  if (orientation === 'wild') {
+    rotation = angles[Math.floor(Math.random() * angles.length)];
+  } else if (orientation === 'flippable') {
+    rotation = [0, 180][Math.floor(Math.random() * 2)];
+  }
+  const odd = rotation % 180 !== 0;
+  rotor.classList.add(odd ? 'rot-odd' : 'rot-even'); // <-- key class
+  rotor.style.transform = `rotate(${rotation}deg)`;   // apply rotation
+
+  // set aspect-ratio after img loads using NATURAL size
+  img.addEventListener('load', () => {
+    const w = img.naturalWidth || 1;
+    const h = img.naturalHeight || 1;
+    const ratio = odd ? (h / w) : (w / h); // width/height AFTER rotation
+    stage.style.aspectRatio = String(ratio);
+
+    // fallback for old browsers without aspect-ratio
+    queueMicrotask(() => {
+      if (!('aspectRatio' in document.body.style)) {
+        const width = stage.clientWidth || 1;
+        stage.style.height = (width / (ratio || 1)) + 'px';
+      }
+    });
+  });
+
+  const cap = document.createElement('div');
+  cap.className = 'image-title';
+  cap.textContent = title || '';
+
+  rotor.appendChild(img);
+  stage.appendChild(rotor);
+  link.appendChild(stage);
+  link.appendChild(cap);
+  grid.appendChild(link);
+});
+let rotation = 0;
   if (orientation === 'wild') {
     rotation = angles[Math.floor(Math.random() * angles.length)];
   } else if (orientation === 'flippable') {
@@ -319,4 +370,5 @@ function applyFilters(){
 </a>
 </body>
 </html>
+
 
