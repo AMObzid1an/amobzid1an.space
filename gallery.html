@@ -94,7 +94,10 @@
   }
 
   .thumb-rotor img{
-    width:100%; height:100%;
+    max-width:100%; 
+    max-height:100%;
+    width:auto;
+    height:auto;
     object-fit:contain;
     border-radius:12px;
     display:block;
@@ -137,6 +140,50 @@
   @media (max-width:520px){
     .gallery-grid{gap:22px;}
   }
+/* --- hard overrides for snug tiles --- */
+.thumb-stage{
+  /* kill the old fixed box + inner padding */
+  height:auto !important;
+  padding:0 !important;
+
+  /* the frame lives on the stage */
+  border:1px solid rgba(255,255,255,.14) !important;
+  border-radius:14px !important;
+  box-shadow:0 0 0 0 rgba(0,187,255,0) !important;
+  position:relative !important;
+  overflow:hidden !important;
+}
+
+.thumb-rotor{
+  position:absolute !important;
+  inset:0 !important;
+  display:grid !important;
+  place-items:center !important;
+  transform-origin:50% 50% !important;
+}
+
+/* remove glow from the image itself */
+.thumb-stage img{
+  box-shadow:none !important;
+  border-radius:12px !important;
+  max-width:100%; max-height:100%;
+  width:auto; height:auto; object-fit:contain;
+}
+
+/* put hover/focus glow on the stage so it hugs the edges */
+.gallery-item:hover .thumb-stage{
+  border-color:rgba(0,187,255,.45) !important;
+  box-shadow:0 0 0 3px rgba(0,187,255,.6), 0 0 28px 8px rgba(0,187,255,.3) !important;
+}
+.gallery-item:focus-within .thumb-stage,
+.gallery-item:focus .thumb-stage{
+  border-color:rgba(0,187,255,.6) !important;
+  box-shadow:0 0 0 3px rgba(0,187,255,.75), 0 0 28px 8px rgba(0,187,255,.35) !important;
+}
+
+/* keep grid breathing */
+.gallery-grid{ gap:26px !important; box-sizing:border-box; }
+
   </style>
 </head>
 <body>
@@ -160,6 +207,7 @@
 <div class="gallery-grid" id="galleryGrid"></div>
 
 <script>
+/* Manifest */
 const images = [
   {thumb:'/assets/gallery/thumbs/85-Verde-Lunaris.jpg', full:'/assets/gallery/full/85-Verde-Lunaris.jpg', title:'85 Verde-Lunaris', type:'digital', orientation:'wild'},
   {thumb:'/assets/gallery/thumbs/XJ-210.jpg',           full:'/assets/gallery/full/XJ-210.jpg',           title:'XJ-210',          type:'digital', orientation:'wild'},
@@ -172,16 +220,15 @@ const images = [
   {thumb:'/assets/gallery/thumbs/Iris-190.jpg',             full:'/assets/gallery/full/Iris-190.jpg',             title:'Iris-190',             type:'digital', orientation:'flippable'}
 ];
 
-// Shuffle
+/* Shuffle */
 for (let i = images.length - 1; i > 0; i--) {
   const j = Math.floor(Math.random() * (i + 1));
   [images[i], images[j]] = [images[j], images[i]];
 }
 
-// Render
+/* Render */
 const grid = document.getElementById('galleryGrid');
 const angles = [0, 90, 180, 270];
-const TILE_RATIO = 2 / 3;
 
 images.forEach(({thumb, full, title, type, orientation = 'wild'}) => {
   const link = document.createElement('a');
@@ -196,21 +243,42 @@ images.forEach(({thumb, full, title, type, orientation = 'wild'}) => {
   const rotor = document.createElement('div');
   rotor.className = 'thumb-rotor';
 
-  const img = document.createElement('img');
-  img.src = thumb;
-  img.alt = title || 'Artwork';
+  const img = new Image();
   img.loading = 'lazy';
+  img.alt = title || 'Artwork';
+  img.src = thumb;
 
+  // Pick angle based on orientation
   let rotation = 0;
   if (orientation === 'wild') {
     rotation = angles[Math.floor(Math.random() * angles.length)];
   } else if (orientation === 'flippable') {
     rotation = [0, 180][Math.floor(Math.random() * 2)];
   }
-  rotor.style.transform = `rotate(${rotation}deg)`;
+  // Apply on rotor, tiny scale for 90/270 so nothing clips
+  const needsScale = rotation % 180 !== 0 ? ' scale(0.95)' : '';
+  rotor.style.transform = `rotate(${rotation}deg)${needsScale}`;
 
-  const rotated = (rotation % 180 !== 0);
-  stage.style.aspectRatio = String(rotated ? 1 / TILE_RATIO : TILE_RATIO);
+  // Set a provisional ratio to avoid layout shift before load
+  stage.style.aspectRatio = '0.66'; // ~2:3 placeholder
+
+  img.addEventListener('load', () => {
+    const w = img.naturalWidth || 1;
+    const h = img.naturalHeight || 1;
+    const rotated = rotation % 180 !== 0;
+
+    // ratio = width/height after rotation
+    const ratio = rotated ? (h / w) : (w / h);
+    stage.style.aspectRatio = String(ratio);
+
+    // Fallback for very old browsers without aspect-ratio
+    queueMicrotask(() => {
+      if (!('aspectRatio' in document.body.style)) {
+        const width = stage.clientWidth || 1;
+        stage.style.height = (width / (ratio || 1)) + 'px';
+      }
+    });
+  });
 
   const cap = document.createElement('div');
   cap.className = 'image-title';
@@ -223,7 +291,7 @@ images.forEach(({thumb, full, title, type, orientation = 'wild'}) => {
   grid.appendChild(link);
 });
 
-// Filters
+/* Filters */
 const state = { type: 'all', orientation: 'all' };
 document.querySelectorAll('#filters button').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -245,8 +313,10 @@ function applyFilters(){
 }
 </script>
 
+
 <a class="credits-portal" href="/credits.html" target="_blank" title="Usage & Credits">
   <img src="Portal.png" alt="Credits">
 </a>
 </body>
 </html>
+
