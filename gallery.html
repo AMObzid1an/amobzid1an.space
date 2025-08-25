@@ -300,36 +300,6 @@ images.forEach(({thumb, full, title, type, orientation = 'wild'}) => {
   link.appendChild(cap);
   grid.appendChild(link);
 });
-let rotation = 0;
-  if (orientation === 'wild') {
-    rotation = angles[Math.floor(Math.random() * angles.length)];
-  } else if (orientation === 'flippable') {
-    rotation = [0, 180][Math.floor(Math.random() * 2)];
-  }
-  // Apply on rotor, tiny scale for 90/270 so nothing clips
-  const needsScale = rotation % 180 !== 0 ? ' scale(0.95)' : '';
-  rotor.style.transform = `rotate(${rotation}deg)${needsScale}`;
-
-  // Set a provisional ratio to avoid layout shift before load
-  stage.style.aspectRatio = '0.66'; // ~2:3 placeholder
-
-  img.addEventListener('load', () => {
-    const w = img.naturalWidth || 1;
-    const h = img.naturalHeight || 1;
-    const rotated = rotation % 180 !== 0;
-
-    // ratio = width/height after rotation
-    const ratio = rotated ? (h / w) : (w / h);
-    stage.style.aspectRatio = String(ratio);
-
-    // Fallback for very old browsers without aspect-ratio
-    queueMicrotask(() => {
-      if (!('aspectRatio' in document.body.style)) {
-        const width = stage.clientWidth || 1;
-        stage.style.height = (width / (ratio || 1)) + 'px';
-      }
-    });
-  });
 
   const cap = document.createElement('div');
   cap.className = 'image-title';
@@ -370,5 +340,6 @@ function applyFilters(){
 </a>
 </body>
 </html>
+
 
 
